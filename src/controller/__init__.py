@@ -17,8 +17,9 @@ class ConsoleStages(Enum):
     TC_Training = 13
     TC_SaveTopology = 14
 
-    Testing_ShowGraph = 20
-    Testing_SaveGraph = 21
+    Testing_Accuracy = 20
+    Testing_ShowGraph = 21
+    Testing_SaveGraph = 22
 
 # import pandas as pd
 
@@ -44,6 +45,7 @@ class Console:
     bitGroupPath = "./data/groups"
     processedDataPath = "./data/processed"
     topologyPath = "./data/models"
+    figurePath = "./data/figures"
     bitGroups = [256,512,1024,2048]
 
     def clear():
@@ -160,7 +162,7 @@ class Console:
                 path = f"{Console.topologyPath}/{model_list[int(inp) - 1]}"
                 print(f"Loading{Console.topologyPath}/{model_list[int(inp) - 1]}")
                 self.topologyConf.load_model(path)
-                self.stage = ConsoleStages.Testing_ShowGraph
+                self.stage = ConsoleStages.Testing_Accuracy
 
             elif(self.stage == ConsoleStages.TC_TopologyTypeSelection):
                 topologies = [e.value for e in Topologies]
@@ -184,14 +186,27 @@ class Console:
                 inp = input(":")
                 if(inp != "n" and inp != "N"):
                     self.topologyConf.save()
-                self.stage = ConsoleStages.Testing_ShowGraph
+                self.stage = ConsoleStages.Testing_Accuracy
 
-            elif(self.stage == ConsoleStages.Testing_ShowGraph):
+
+            elif(self.stage == ConsoleStages.Testing_Accuracy):
                 self.topologyConf.test(self.topologyConf.topology.model, 
                                        [self.modelConf.inputs, 
                                         self.modelConf.outputs])
-                print("Finished!")
-                break
+                print("Show graph? (y/n)")
+                inp = input(":")
+                if(inp != "n" and inp != "N"):
+                    self.stage = ConsoleStages.Testing_ShowGraph
+                else:
+                    break
+
+            elif(self.stage == ConsoleStages.Testing_ShowGraph):
+                self.topologyConf.graph()
+                self.stage = ConsoleStages.Testing_SaveGraph
 
             elif(self.stage == ConsoleStages.Testing_SaveGraph):
-                pass
+                print("Save graph? (y/n)")
+                inp = input(":")
+                if(inp != "n" and inp != "N"):
+                    self.topologyConf.saveGraph(Console.figurePath)
+                break

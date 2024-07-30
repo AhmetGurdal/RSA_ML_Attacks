@@ -12,6 +12,9 @@ class Topology:
         self.conf = conf
         self.type = type
         self.topology = None
+        self.fig = None
+        self.errors = None
+
         if(type == Topologies.MultiDense):
             from src.topologies.multidense import MultiDense
             self.topology = MultiDense()
@@ -37,15 +40,13 @@ class Topology:
         self.topology.model.save(f'{Console.topologyPath}/{self.topology.topologyName}_{self.conf.model.modelName}_{self.conf.bit_group}.keras')
 
     def test(self, model, data):
-        
-        from numpy import array
-        import matplotlib.pyplot as plt
-
         inputs = data[0]
         targets = data[1]
+
+        print("Creating Predictions")
         # Run prediction
         predictions = model.predict(inputs)
-
+        print("Please wait for calculating the accuracy!")
         # Accuracy Calculation
         total = 0
         correct = 0
@@ -64,21 +65,27 @@ class Topology:
         print(f"{correct}/{total}")
         print(f"Acc: {correct/total}")
 
-        def graph():
-            xs = array(sorted(list(self.errors.keys())))
-            ys = array([self.errors[i] for i in xs])
+        
+    def graph(self):
+        from numpy import array
+        import matplotlib.pyplot as plt
+        xs = array(sorted(list(self.errors.keys())))
+        ys = array([self.errors[i] for i in xs])
 
-            _, ax = plt.subplots()
-            ax.plot(xs,ys)
-            ax.set_ylim([0, max(self.errors.values()) + 1000])
-            # def annot_max(x,y,i, ax=None):
-            #     text= "x={}, y={}".format(x+1, y)
-            #     if not ax:
-            #         ax=plt.gca()
-            #     bbox_props = dict(boxstyle="square,pad=0.3", fc="w", ec="k", lw=0.72)
-            #     arrowprops=dict(arrowstyle="->",connectionstyle="angle,angleA=0,angleB=60")
-            #     kw = dict(xycoords='data',textcoords="axes fraction",
-            #             arrowprops=arrowprops, bbox=bbox_props, ha="center", va="top")
-            #     ax.annotate(text, xy=(x, y), xytext=(0.3,0.9 - (i * 0.1)), **kw)
-            plt.show()
-        graph()
+        self.fig, ax = plt.subplots()
+        ax.plot(xs,ys)
+        ax.set_ylim([0, max(self.errors.values()) + 1000])
+        # def annot_max(x,y,i, ax=None):
+        #     text= "x={}, y={}".format(x+1, y)
+        #     if not ax:
+        #         ax=plt.gca()
+        #     bbox_props = dict(boxstyle="square,pad=0.3", fc="w", ec="k", lw=0.72)
+        #     arrowprops=dict(arrowstyle="->",connectionstyle="angle,angleA=0,angleB=60")
+        #     kw = dict(xycoords='data',textcoords="axes fraction",
+        #             arrowprops=arrowprops, bbox=bbox_props, ha="center", va="top")
+        #     ax.annotate(text, xy=(x, y), xytext=(0.3,0.9 - (i * 0.1)), **kw)
+        
+        plt.show()
+
+    def saveGraph(self, path):
+        self.fig.savefig(f"{path}/{self.topology.topologyName}_{self.conf.model.modelName}_{self.conf.bit_group}.png")
