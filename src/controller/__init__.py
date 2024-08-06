@@ -21,26 +21,6 @@ class ConsoleStages(Enum):
     Testing_ShowGraph = 21
     Testing_SaveGraph = 22
 
-# import pandas as pd
-
-# from src.modelConfigurations import ModelConfiguration, ModelConfigurations
-# from src.topologies import Topology, Topologies
-
-# df = pd.read_csv("./data/groups/rsa_256.csv",header=None)
-
-# modelConf = ModelConfiguration(ModelConfigurations.ModelNP,
-#                                256)
-# modelConf.process(df[2].to_list(),
-#                   df[0].to_list())
-# modelConf.save()
-
-# topology = Topology(Topologies.MultiDense,
-#                     modelConf)
-
-# topology.train()
-# topology.save()
-
-# topology.test()
 class Console:
     bitGroupPath = "./data/groups"
     processedDataPath = "./data/processed"
@@ -81,14 +61,16 @@ class Console:
                     input()
                     self.stage = ConsoleStages.MC_DataSelection
                     continue
-                for i,v in enumerate(data_list):
+                data_set = set(["_".join(i.split("_")[:2]) for i in data_list])
+                for i,v in enumerate(data_set):
                     print(f"{i+1}-{v}")
                 inp = input(":")
-                modelName, bitGroup = data_list[int(inp)-1].split(".")[0].split("_")
+                modelName, bitGroup = data_list[int(inp)-1].split(".")[0].split("_")[:2]
                 
                 self.modelConf = ModelConfiguration(ModelConfigurations[modelName], int(bitGroup))
-                data = load(f"{Console.processedDataPath}/{modelName}_{bitGroup}.npy")
-                self.modelConf.setData(data[0],data[1])
+                inputs = load(f"{Console.processedDataPath}/{modelName}_{bitGroup}_inputs.npy")
+                outputs = load(f"{Console.processedDataPath}/{modelName}_{bitGroup}_outputs.npy")
+                self.modelConf.setPostData(inputs,outputs)
                 self.stage = ConsoleStages.TC_TopologyDecision
 
             elif(self.stage == ConsoleStages.MC_DataSelection):
@@ -106,31 +88,32 @@ class Console:
                 print("Select Model Type")
                 for i,v in enumerate(models):
                     print(f"{i+1}-{v}")
-                
                 inp = input(":")
                 selectedModelType = models[int(inp)-1]
                 print(f"{selectedModelType} is selected!")
-
                 print("Select Bit Length")
                 for i, bit in enumerate(Console.bitGroups):
                     print(f"{i+1}-{bit}")
                 inp = input(":")
                 selectedBitLength = Console.bitGroups[int(inp)-1]
-                
                 self.modelConf = ModelConfiguration(ModelConfigurations[selectedModelType],
                                                     selectedBitLength)
                 self.stage = ConsoleStages.MC_DataProcessing
             
             elif(self.stage == ConsoleStages.MC_DataProcessing):
                 # TODO : Input Output generations dynamicly to model requirements!
+                print("inputColumns",self.modelConf.model.inputColumns)
+                print("outputColumns",self.modelConf.model.outputColumns)
                 inputs = self.df[self.modelConf.model.inputColumns].to_numpy()
                 outputs = self.df[self.modelConf.model.outputColumns].to_numpy()
-                self.modelConf.setData(inputs,outputs)
+                self.modelConf.setPreData(inputs,outputs)
                 self.modelConf.process()
                 self.stage = ConsoleStages.MC_Saving
 
             elif(self.stage == ConsoleStages.MC_Saving):
-                print("Saving file (y/n)")
+                print("Input  shape",self.modelConf.model.inputs.shape)
+                print("Output shape",self.modelConf.model.outputs.shape)
+                print("Saving data file (y/n)")
                 inp = input(":")
                 if(inp != "n" and inp != "N"):
                     self.modelConf.save()
@@ -190,15 +173,14 @@ class Console:
 
 
             elif(self.stage == ConsoleStages.Testing_Accuracy):
-                self.topologyConf.test(self.topologyConf.topology.model, 
-                                       [self.modelConf.inputs, 
-                                        self.modelConf.outputs])
-                print("Show graph? (y/n)")
-                inp = input(":")
-                if(inp != "n" and inp != "N"):
-                    self.stage = ConsoleStages.Testing_ShowGraph
-                else:
-                    break
+                self.topologyConf.test()
+                self.stage = ConsoleStages.Testing_SaveGraph
+                
+                #print("Show graph? (y/n)")
+                #inp = input(":")
+                #if(inp != "n" and inp != "N"):
+                #    self.stage = ConsoleStages.Testing_ShowGraph
+                #else:
 
             elif(self.stage == ConsoleStages.Testing_ShowGraph):
                 self.topologyConf.graph()
@@ -208,5 +190,6 @@ class Console:
                 print("Save graph? (y/n)")
                 inp = input(":")
                 if(inp != "n" and inp != "N"):
+                    self.topologyConf.graph()
                     self.topologyConf.saveGraph(Console.figurePath)
                 break

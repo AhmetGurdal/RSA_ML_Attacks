@@ -10,6 +10,7 @@ class ModelConfigurations(Enum):
     ModelSOA = "ModelSOA"
     ModelNPHI = "ModelNPHI"
     ModelMNPQ = "ModelMNPQ"
+    ModelNP2 = "ModelNP2"
     # Add new data configuration type here!
 
 class ModelConfiguration:
@@ -46,15 +47,23 @@ class ModelConfiguration:
         elif(model == ModelConfigurations.ModelMNPQ):
             from src.modelConfigurations.modelmnpq import ModelMNPQ
             self.model = ModelMNPQ()
+        elif(model == ModelConfigurations.ModelNP2):
+            from src.modelConfigurations.modelnp2 import ModelNP2
+            self.model = ModelNP2()
         else:
             print("No Model Found!")
         # Add new data configuration type condition here!
 
         assert self.model != None, "Model is null!"
 
-    def setData(self, inputs, outputs):
+    def setPreData(self, inputs, outputs):
         self.inputs = inputs
         self.outputs = outputs
+        self.model.setSizes(len(inputs), self.bit_group)
+
+    def setPostData(self, inputs, outputs):
+        self.model.inputs = inputs
+        self.model.outputs = outputs
         self.model.setSizes(len(inputs), self.bit_group)
         
 
@@ -63,8 +72,12 @@ class ModelConfiguration:
         self.model.process(self.inputs, self.outputs, self.bit_group)
 
     def save(self):
-        from numpy import save, array
+        from numpy import save
         from src.controller import Console
-        save(f"{Console.processedDataPath}/{self.model.modelName}_{self.bit_group}.npy",
-             array([self.model.inputs, self.model.outputs]))
+        print(self.model.inputs.shape)
+        print(self.model.outputs.shape)
+        save(f"{Console.processedDataPath}/{self.model.modelName}_{self.bit_group}_inputs.npy",
+             self.model.inputs)
+        save(f"{Console.processedDataPath}/{self.model.modelName}_{self.bit_group}_outputs.npy",
+             self.model.outputs)
         

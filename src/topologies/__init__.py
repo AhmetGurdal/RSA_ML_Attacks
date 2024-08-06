@@ -5,6 +5,7 @@ from src.modelConfigurations import ModelConfiguration
 
 class Topologies(Enum):
     MultiDense = "MultiDense"
+    Test = "Test"
     # Add new network topology type here!
 
 class Topology:
@@ -18,6 +19,9 @@ class Topology:
         if(type == Topologies.MultiDense):
             from src.topologies.multidense import MultiDense
             self.topology = MultiDense()
+        elif(type == Topologies.Test):
+            from src.topologies.test import Test
+            self.topology = Test()
         # Add new network topology type condition here!
 
     def load_model(self,path):
@@ -27,11 +31,11 @@ class Topology:
     def train(self):
         self.topology.create(self.conf.model.sizes[0][1],
                              self.conf.model.sizes[1][1])
-        inputs = self.conf.inputs
-        outputs = self.conf.outputs
+        inputs = self.conf.model.inputs
+        outputs = self.conf.model.outputs
         self.topology.model.fit(inputs[:50000], 
                                 outputs[:50000], 
-                                epochs=1, 
+                                epochs=100, 
                                 validation_data=(inputs[50000:], 
                                                  outputs[50000:]))
     
@@ -39,15 +43,13 @@ class Topology:
         from src.controller import Console
         self.topology.model.save(f'{Console.topologyPath}/{self.topology.topologyName}_{self.conf.model.modelName}_{self.conf.bit_group}.keras')
 
-    def test(self, model, data):
-        inputs = data[0]
-        targets = data[1]
+    def test(self):
+        inputs = self.conf.model.inputs[50000:]
+        targets = self.conf.model.outputs[50000:]
 
         print("Creating Predictions")
-        # Run prediction
-        predictions = model.predict(inputs)
+        predictions = self.topology.model.predict(inputs)
         print("Please wait for calculating the accuracy!")
-        # Accuracy Calculation
         total = 0
         correct = 0
         self.errors = {}
@@ -84,8 +86,9 @@ class Topology:
         #     kw = dict(xycoords='data',textcoords="axes fraction",
         #             arrowprops=arrowprops, bbox=bbox_props, ha="center", va="top")
         #     ax.annotate(text, xy=(x, y), xytext=(0.3,0.9 - (i * 0.1)), **kw)
-        
-        plt.show()
+        #plt.show()
 
     def saveGraph(self, path):
+        from pickle import dump
+        dump(self.fig,open(f"{path}/{self.topology.topologyName}_{self.conf.model.modelName}_{self.conf.bit_group}.pickle",'wb'))
         self.fig.savefig(f"{path}/{self.topology.topologyName}_{self.conf.model.modelName}_{self.conf.bit_group}.png")
