@@ -27,9 +27,9 @@ class ModelSOA:
             ctx.prec = 300
             for i in range(size):
 
-                N = Decimal(inputs[i])
+                N = Decimal(int(inputs[i]))
                 S = N.sqrt()
-                p = Decimal(outputs[i])
+                p = Decimal(int(outputs[i]))
                 RS = Helper.roundodd(S,1)
                 a = Decimal(RS) - p
 

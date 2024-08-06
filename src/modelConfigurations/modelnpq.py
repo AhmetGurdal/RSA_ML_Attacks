@@ -20,7 +20,6 @@ class ModelNPQ:
 
         size = len(inputs)
         self.sizes = ((size,bit_group*2), (size,bit_group*2))
-        print(self.sizes)
         
         #Empty data
         self.inputs = empty(shape=self.sizes[0])

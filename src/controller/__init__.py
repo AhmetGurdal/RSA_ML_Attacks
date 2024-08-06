@@ -45,8 +45,9 @@ class Console:
         while True:
             Console.clear()
             if(self.stage == ConsoleStages.MC_DataDecision):
-                print("1- Process data")
-                print("2- Load processed data")
+                print("Select the data preparation option")
+                print("1- Create new dataset")
+                print("2- Load processed dataset")
                 inp = input(":")
                 if(inp == "1"):
                     self.stage = ConsoleStages.MC_DataSelection
@@ -61,44 +62,61 @@ class Console:
                     input()
                     self.stage = ConsoleStages.MC_DataSelection
                     continue
+
                 data_set = set(["_".join(i.split("_")[:2]) for i in data_list])
                 for i,v in enumerate(data_set):
                     print(f"{i+1}-{v}")
-                inp = input(":")
-                modelName, bitGroup = data_list[int(inp)-1].split(".")[0].split("_")[:2]
-                
-                self.modelConf = ModelConfiguration(ModelConfigurations[modelName], int(bitGroup))
-                inputs = load(f"{Console.processedDataPath}/{modelName}_{bitGroup}_inputs.npy")
-                outputs = load(f"{Console.processedDataPath}/{modelName}_{bitGroup}_outputs.npy")
-                self.modelConf.setPostData(inputs,outputs)
-                self.stage = ConsoleStages.TC_TopologyDecision
+                while True:
+                    try:
+                        inp = input(":")
+                        modelName, bitGroup = data_list[int(inp)-1].split(".")[0].split("_")[:2]
+                        
+                        self.modelConf = ModelConfiguration(ModelConfigurations[modelName], int(bitGroup))
+                        inputs = load(f"{Console.processedDataPath}/{modelName}_{bitGroup}_inputs.npy")
+                        outputs = load(f"{Console.processedDataPath}/{modelName}_{bitGroup}_outputs.npy")
+                        self.modelConf.setPostData(inputs,outputs)
+                        self.stage = ConsoleStages.TC_TopologyDecision
+                        break
+                    except:
+                        continue
 
             elif(self.stage == ConsoleStages.MC_DataSelection):
                 from pandas import read_csv
                 data_list = listdir(Console.bitGroupPath)
                 for i,v in enumerate(data_list):
                     print(f"{i + 1} - {v}")
-                inp = input(":")
-                self.df = read_csv(f"{Console.bitGroupPath}/{data_list[int(inp)-1]}", 
-                                   names=["p","q","n","phi","e","d"])
-                self.stage = ConsoleStages.MC_ModelTypeSelection
+                while True:
+                    try:
+                        inp = input(":")
+                        self.df = read_csv(f"{Console.bitGroupPath}/{data_list[int(inp)-1]}", 
+                                        names=["p","q","n","phi","e","d"])
+                        self.stage = ConsoleStages.MC_ModelTypeSelection
+                        break
+                    except:
+                        continue
 
             elif(self.stage == ConsoleStages.MC_ModelTypeSelection):
                 models = [e.value for e in ModelConfigurations]
-                print("Select Model Type")
-                for i,v in enumerate(models):
-                    print(f"{i+1}-{v}")
-                inp = input(":")
-                selectedModelType = models[int(inp)-1]
-                print(f"{selectedModelType} is selected!")
-                print("Select Bit Length")
-                for i, bit in enumerate(Console.bitGroups):
-                    print(f"{i+1}-{bit}")
-                inp = input(":")
-                selectedBitLength = Console.bitGroups[int(inp)-1]
-                self.modelConf = ModelConfiguration(ModelConfigurations[selectedModelType],
-                                                    selectedBitLength)
-                self.stage = ConsoleStages.MC_DataProcessing
+                while True:
+                    try:
+                        print("Select Model Type")
+                        for i,v in enumerate(models):
+                            print(f"{i+1}-{v}")
+                        inp = input(":")
+                        selectedModelType = models[int(inp)-1]
+                        print(f"{selectedModelType} is selected!")
+                        print("------------------------------------\n")
+                        print("Select Bit Length")
+                        for i, bit in enumerate(Console.bitGroups):
+                            print(f"{i+1}-{bit}")
+                        inp = input(":")
+                        selectedBitLength = Console.bitGroups[int(inp)-1]
+                        self.modelConf = ModelConfiguration(ModelConfigurations[selectedModelType],
+                                                            selectedBitLength)
+                        self.stage = ConsoleStages.MC_DataProcessing
+                        break
+                    except:
+                        continue
             
             elif(self.stage == ConsoleStages.MC_DataProcessing):
                 # TODO : Input Output generations dynamicly to model requirements!
@@ -113,7 +131,7 @@ class Console:
             elif(self.stage == ConsoleStages.MC_Saving):
                 print("Input  shape",self.modelConf.model.inputs.shape)
                 print("Output shape",self.modelConf.model.outputs.shape)
-                print("Saving data file (y/n)")
+                print("Save processed data file (y/n)(default:y)")
                 inp = input(":")
                 if(inp != "n" and inp != "N"):
                     self.modelConf.save()
@@ -130,42 +148,52 @@ class Console:
 
             elif(self.stage == ConsoleStages.TC_LoadTopologySelection):
                 model_list = listdir(Console.topologyPath)
-                print("Select a model to load!")
-                if(len(model_list) == 0):
-                    print("No data found! Type ENTER to create!")
-                    input()
-                    self.stage = ConsoleStages.TC_TopologyTypeSelection
-                    continue
-                for i,v in enumerate(model_list):
-                    print(f"{i+1}-{v}")
+                while True:
+                    try:
+                        print("Select a model to load!")
+                        if(len(model_list) == 0):
+                            print("No data found! Type ENTER to create!")
+                            input()
+                            self.stage = ConsoleStages.TC_TopologyTypeSelection
+                            continue
+                        for i,v in enumerate(model_list):
+                            print(f"{i+1}-{v}")
+                        inp = input(":")
+                        selectedTopologyName = model_list[int(inp) - 1].split("_")[0]
+                        self.topologyConf = Topology(Topologies[selectedTopologyName],self.modelConf)
+                        path = f"{Console.topologyPath}/{model_list[int(inp) - 1]}"
+                        print(f"Loading {Console.topologyPath}/{model_list[int(inp) - 1]}")
+                        self.topologyConf.load_model(path)
+                        self.stage = ConsoleStages.Testing_Accuracy
+                        break
+                    except:
+                        continue
 
-                inp = input(":")
-                selectedTopologyName = model_list[int(inp) - 1].split("_")[0]
-                self.topologyConf = Topology(Topologies[selectedTopologyName],self.modelConf)
-                path = f"{Console.topologyPath}/{model_list[int(inp) - 1]}"
-                print(f"Loading{Console.topologyPath}/{model_list[int(inp) - 1]}")
-                self.topologyConf.load_model(path)
-                self.stage = ConsoleStages.Testing_Accuracy
 
             elif(self.stage == ConsoleStages.TC_TopologyTypeSelection):
                 topologies = [e.value for e in Topologies]
-                print("Select Model Type")
-                for i,v in enumerate(topologies):
-                    print(f"{i+1}-{v}")
-                
-                inp = input(":")
-                selectedTopology = topologies[int(inp)-1]
-                print(f"{selectedTopology} is selected!")
+                while True:
+                    try:
+                        print("Select Model Type")
+                        for i,v in enumerate(topologies):
+                            print(f"{i+1}-{v}")
+                        
+                        inp = input(":")
+                        selectedTopology = topologies[int(inp)-1]
+                        print(f"{selectedTopology} is selected!")
 
-                self.topologyConf = Topology(Topologies[selectedTopology],self.modelConf)
-                self.stage = ConsoleStages.TC_Training
-            
+                        self.topologyConf = Topology(int(inp)-1,self.modelConf)
+                        self.stage = ConsoleStages.TC_Training
+                        break
+                    except:
+                        continue
+
             elif(self.stage == ConsoleStages.TC_Training):
                 self.topologyConf.train()
                 self.stage = ConsoleStages.TC_SaveTopology
 
             elif(self.stage == ConsoleStages.TC_SaveTopology):
-                print("Saving file (y/n)")
+                print("Save trained model file (y/n)(default:y)")
                 inp = input(":")
                 if(inp != "n" and inp != "N"):
                     self.topologyConf.save()
@@ -187,7 +215,7 @@ class Console:
                 self.stage = ConsoleStages.Testing_SaveGraph
 
             elif(self.stage == ConsoleStages.Testing_SaveGraph):
-                print("Save graph? (y/n)")
+                print("Create and Save Faulty Bit Position Graph? (y/n)")
                 inp = input(":")
                 if(inp != "n" and inp != "N"):
                     self.topologyConf.graph()

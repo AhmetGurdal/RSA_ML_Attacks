@@ -22,7 +22,13 @@ class Topology:
         elif(type == Topologies.Test):
             from src.topologies.test import Test
             self.topology = Test()
-        # Add new network topology type condition here!
+        else:
+            print("No Topology Found!")
+        
+        # Add new network topology type condition here before the else condition!
+
+        assert self.topology != None, "Topology is null!"
+        
 
     def load_model(self,path):
         from tensorflow.keras.models import load_model

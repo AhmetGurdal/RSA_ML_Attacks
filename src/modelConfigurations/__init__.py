@@ -52,7 +52,7 @@ class ModelConfiguration:
             self.model = ModelNP2()
         else:
             print("No Model Found!")
-        # Add new data configuration type condition here!
+        # Add new data configuration type condition before the else condition!
 
         assert self.model != None, "Model is null!"
 

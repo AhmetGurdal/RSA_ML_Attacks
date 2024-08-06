@@ -28,12 +28,13 @@ class ModelSP:
             ctx.prec = 300
             for i in range(size):
 
-                N = Decimal(inputs[i])
+                N = Decimal(int(inputs[i]))
                 S = N.sqrt()
 
                 # Input Data
                 RS_bin =  str(bin(int(round(S))))[2:]
                 RS_bin = RS_bin.zfill(self.sizes[0][1])
+                
                 # Output Data
                 p_bin = str(bin(int(outputs[i])))[2:]
                 p_bin = p_bin.zfill(self.sizes[1][1])
