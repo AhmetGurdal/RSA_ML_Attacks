@@ -15,18 +15,14 @@ class Topology:
         self.topology = None
         self.fig = None
         self.errors = None
-
         if(type == Topologies.MultiDense):
             from src.topologies.multidense import MultiDense
             self.topology = MultiDense()
         elif(type == Topologies.Test):
             from src.topologies.test import Test
             self.topology = Test()
-        else:
-            print("No Topology Found!")
         
-        # Add new network topology type condition here before the else condition!
-
+        # Add new network topology type condition here!
         assert self.topology != None, "Topology is null!"
         
 
