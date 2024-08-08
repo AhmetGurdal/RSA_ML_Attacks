@@ -31,7 +31,7 @@ class ModelNPHI:
             # Output Data
             
             phi_bin = str(bin(int(outputs[i])))[2:]
-            phi_bin = phi_bin.zfill(self.sizes[1][1]/2)
+            phi_bin = phi_bin.zfill(self.sizes[1][1])
 
             # Assigning
             self.inputs[i] = [int(i) for i in list(n_bin)]
