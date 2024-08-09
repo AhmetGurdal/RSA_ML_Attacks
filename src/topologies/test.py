@@ -10,9 +10,9 @@ class Test:
         print("I Size", i_size)
         print("O Size", o_size)
         from tensorflow.keras.models import Sequential
-        from tensorflow.keras.layers import Dense
+        from tensorflow.keras.layers import LSTM, Dense
         self.model = Sequential([
-            Dense(i_size, activation='relu', input_shape=(i_size,)),
+            LSTM(1, input_shape=(i_size,1), return_sequences=False),
             Dense(activation='sigmoid', units=o_size)
         ])
 

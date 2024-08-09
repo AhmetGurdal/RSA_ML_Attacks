@@ -38,6 +38,7 @@ class Topology:
         self.topology.model.fit(inputs[:50000], 
                                 outputs[:50000], 
                                 epochs=100, 
+                                verbose=2,
                                 validation_data=(inputs[50000:], 
                                                  outputs[50000:]))
     

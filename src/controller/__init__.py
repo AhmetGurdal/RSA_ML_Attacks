@@ -68,21 +68,20 @@ class Console:
                     self.stage = ConsoleStages.MC_DataSelection
                     continue
 
-                data_set = set(["_".join(i.split("_")[:2]) for i in data_list])
+                data_set = list(set(["_".join(i.split("_")[:2]) for i in data_list]))
                 for i,v in enumerate(data_set):
                     print(f"{i+1}-{v}")
                 
                 try:
                     inp = input(":")
-                    modelName, bitGroup = data_list[int(inp)-1].split(".")[0].split("_")[:2]
-                    
+                    modelName, bitGroup = data_set[int(inp)-1].split("_")[:2]
                     self.modelConf = ModelConfiguration(ModelConfigurations[modelName], int(bitGroup))
                     inputs = load(f"{Console.processedDataPath}/{modelName}_{bitGroup}_inputs.npy")
                     outputs = load(f"{Console.processedDataPath}/{modelName}_{bitGroup}_outputs.npy")
                     self.modelConf.setPostData(inputs,outputs)
                     self.stage = ConsoleStages.TC_TopologyDecision
                 except:
-                    continue
+                    break
 
             elif(self.stage == ConsoleStages.MC_DataSelection):
                 from pandas import read_csv
@@ -140,6 +139,7 @@ class Console:
                 self.stage = ConsoleStages.TC_TopologyDecision
             
             elif(self.stage == ConsoleStages.TC_TopologyDecision):
+                print("Model Configuration ", self.modelConf.model.modelName, "is ready")
                 print("1- Create new model")
                 print("2- Load keras file")
                 inp = input(":")
