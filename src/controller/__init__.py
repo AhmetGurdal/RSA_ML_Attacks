@@ -14,8 +14,9 @@ class ConsoleStages(Enum):
     TC_TopologyDecision = 10
     TC_LoadTopologySelection = 11
     TC_TopologyTypeSelection = 12
-    TC_Training = 13
-    TC_SaveTopology = 14
+    TC_TopologyEpoch = 13
+    TC_Training = 14
+    TC_SaveTopology = 15
 
     Testing_Accuracy = 20
     Testing_ShowGraph = 21
@@ -139,7 +140,7 @@ class Console:
                 self.stage = ConsoleStages.TC_TopologyDecision
             
             elif(self.stage == ConsoleStages.TC_TopologyDecision):
-                print("Model Configuration ", self.modelConf.model.modelName, "is ready")
+                print("Model Configuration", self.modelConf.model.modelName, "is ready")
                 print("1- Create new model")
                 print("2- Load keras file")
                 inp = input(":")
@@ -164,9 +165,11 @@ class Console:
                     selectedTopologyName = model_list[int(inp) - 1].split("_")[0]
                     self.topologyConf = Topology(Topologies[selectedTopologyName],self.modelConf)
                     path = f"{Console.topologyPath}/{model_list[int(inp) - 1]}"
-                    print(f"Loading {Console.topologyPath}/{model_list[int(inp) - 1]}")
+                    print(f"Loading {path}")
                     self.topologyConf.load_model(path)
+                    
                     self.stage = ConsoleStages.Testing_Accuracy
+
                 except:
                     continue
 
@@ -184,8 +187,16 @@ class Console:
                 print(f"{selectedTopology} is selected!")
 
                 self.topologyConf = Topology(Topologies[selectedTopology],self.modelConf)
-                self.stage = ConsoleStages.TC_Training
+                self.stage = ConsoleStages.TC_TopologyEpoch
 
+            elif(self.stage == ConsoleStages.TC_TopologyEpoch):
+                try:
+                    inp = input("Epoch:")
+                    self.topologyConf.setEpoch(int(inp))
+                    self.stage = ConsoleStages.TC_Training
+                except:
+                    print("Wrong Epoch!")
+                    
             elif(self.stage == ConsoleStages.TC_Training):
                 self.topologyConf.train()
                 self.stage = ConsoleStages.TC_SaveTopology

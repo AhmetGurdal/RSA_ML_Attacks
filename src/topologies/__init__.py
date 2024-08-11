@@ -15,6 +15,7 @@ class Topology:
         self.topology = None
         self.fig = None
         self.errors = None
+        self.epoch = None
         if(type == Topologies.MultiDense):
             from src.topologies.multidense import MultiDense
             self.topology = MultiDense()
@@ -30,6 +31,9 @@ class Topology:
         from tensorflow.keras.models import load_model
         self.topology.model = load_model(path)
 
+    def setEpoch(self, epoch):
+        self.epoch = epoch
+
     def train(self):
         self.topology.create(self.conf.model.sizes[0][1],
                              self.conf.model.sizes[1][1])
@@ -37,14 +41,14 @@ class Topology:
         outputs = self.conf.model.outputs
         self.topology.model.fit(inputs[:50000], 
                                 outputs[:50000], 
-                                epochs=100, 
+                                epochs=self.epoch, 
                                 verbose=2,
                                 validation_data=(inputs[50000:], 
                                                  outputs[50000:]))
     
     def save(self):
         from src.controller import Console
-        self.topology.model.save(f'{Console.topologyPath}/{self.topology.topologyName}_{self.conf.model.modelName}_{self.conf.bit_group}.keras')
+        self.topology.model.save(f'{Console.topologyPath}/{self.topology.topologyName}_{self.conf.model.modelName}_b{self.conf.bit_group}_e{self.epoch}.keras')
 
     def test(self):
         inputs = self.conf.model.inputs[50000:]
@@ -59,6 +63,8 @@ class Topology:
         for i in range(len(predictions)):
             target = targets[i]
             for j in range(len(predictions[i])):
+                # print(f"predictions[{i}][{j}]",predictions[i][j])
+                # print(f"target[{j}]",target[j])
                 if(round(predictions[i][j]) == target[j]):
                     correct += 1
                 else:
@@ -93,5 +99,5 @@ class Topology:
 
     def saveGraph(self, path):
         from pickle import dump
-        dump(self.fig,open(f"{path}/{self.topology.topologyName}_{self.conf.model.modelName}_{self.conf.bit_group}.pickle",'wb'))
-        self.fig.savefig(f"{path}/{self.topology.topologyName}_{self.conf.model.modelName}_{self.conf.bit_group}.png")
+        dump(self.fig,open(f"{path}/{self.topology.topologyName}_{self.conf.model.modelName}_b{self.conf.bit_group}_e{self.epoch}.pickle",'wb'))
+        self.fig.savefig(f"{path}/{self.topology.topologyName}_{self.conf.model.modelName}_b{self.conf.bit_group}_e{self.epoch}.png")
