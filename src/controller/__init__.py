@@ -152,26 +152,28 @@ class Console:
             elif(self.stage == ConsoleStages.TC_LoadTopologySelection):
                 model_list = listdir(Console.topologyPath)
                 
-                try:
-                    print("Select a model to load!")
-                    if(len(model_list) == 0):
-                        print("No data found! Type ENTER to create!")
-                        input()
-                        self.stage = ConsoleStages.TC_TopologyTypeSelection
-                        continue
-                    for i,v in enumerate(model_list):
-                        print(f"{i+1}-{v}")
-                    inp = input(":")
-                    selectedTopologyName = model_list[int(inp) - 1].split("_")[0]
-                    self.topologyConf = Topology(Topologies[selectedTopologyName],self.modelConf)
-                    path = f"{Console.topologyPath}/{model_list[int(inp) - 1]}"
-                    print(f"Loading {path}")
-                    self.topologyConf.load_model(path)
-                    
-                    self.stage = ConsoleStages.Testing_Accuracy
-
-                except:
+                #try:
+                print("Select a model to load!")
+                if(len(model_list) == 0):
+                    print("No data found! Type ENTER to create!")
+                    input()
+                    self.stage = ConsoleStages.TC_TopologyTypeSelection
                     continue
+                for i,v in enumerate(model_list):
+                    print(f"{i+1}-{v}")
+                inp = input(":")
+                split = model_list[int(inp) - 1].split(".")[0].split("_")
+                selectedTopologyName = split[0]
+                self.topologyConf = Topology(Topologies[selectedTopologyName],self.modelConf)
+                self.topologyConf.setEpoch(int(split[-1][1:]))
+                path = f"{Console.topologyPath}/{model_list[int(inp) - 1]}"
+                print(f"Loading {path}")
+                self.topologyConf.load_model(path)
+                
+                self.stage = ConsoleStages.Testing_Accuracy
+
+                # except:
+                #    continue
 
 
             elif(self.stage == ConsoleStages.TC_TopologyTypeSelection):
