@@ -51,6 +51,7 @@ class Topology:
         self.topology.model.save(f'{Console.topologyPath}/{self.topology.topologyName}_{self.conf.model.modelName}_b{self.conf.bit_group}_e{self.epoch}.keras')
 
     def test(self):
+        from numpy import isnan
         inputs = self.conf.model.inputs[50000:]
         targets = self.conf.model.outputs[50000:]
 
@@ -63,6 +64,8 @@ class Topology:
         for i in range(len(predictions)):
             target = targets[i]
             for j in range(len(predictions[i])):
+                if(isnan(predictions[i][j])):
+                    continue
                 # print(f"predictions[{i}][{j}]",predictions[i][j])
                 # print(f"target[{j}]",target[j])
                 if(round(predictions[i][j]) == target[j]):
@@ -74,7 +77,7 @@ class Topology:
                         self.errors[j] = 1
                 total += 1
         print(f"{correct}/{total}")
-        print(f"Acc: {correct/total}")
+        print(f"Acc: {0 if total == 0 else correct/total}")
 
         
     def graph(self):
@@ -85,7 +88,8 @@ class Topology:
 
         self.fig, ax = plt.subplots()
         ax.plot(xs,ys)
-        ax.set_ylim([0, max(self.errors.values()) + 1000])
+        max_y = 100 if len(self.errors) == 0 else max(self.errors.values()) + 1000
+        ax.set_ylim([0, max_y])
         # def annot_max(x,y,i, ax=None):
         #     text= "x={}, y={}".format(x+1, y)
         #     if not ax:

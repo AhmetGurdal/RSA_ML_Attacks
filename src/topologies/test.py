@@ -9,7 +9,7 @@ class Test:
     def create(self, i_size,o_size):
         from tensorflow.keras.models import Sequential
         from tensorflow.keras.layers import Conv1D, MaxPooling1D, Dropout, Flatten, LSTM, Dense
-        
+        from tensorflow.keras.optimizers import Adam 
         print("I Size", i_size)
         print("O Size", o_size)
 
@@ -42,7 +42,8 @@ class Test:
         #self.model.add(Dense(1, activation='sigmoid'))
         
         # Compile the model
-        self.model.compile(optimizer='adam', loss='binary_crossentropy')
+        optimizer = Adam(learning_rate=0.001) 
+        self.model.compile(optimizer=optimizer, loss='binary_crossentropy')
         
         # self.model = Sequential([
         #     LSTM(1, input_shape=(i_size,1), return_sequences=False),
