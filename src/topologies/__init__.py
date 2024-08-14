@@ -5,7 +5,7 @@ from src.modelConfigurations import ModelConfiguration
 
 class Topologies(Enum):
     MultiDense = "MultiDense"
-    Test = "Test"
+    VariousLayers = "VariousLayers"
     # Add new network topology type here!
 
 class Topology:
@@ -19,9 +19,9 @@ class Topology:
         if(type == Topologies.MultiDense):
             from src.topologies.multidense import MultiDense
             self.topology = MultiDense()
-        elif(type == Topologies.Test):
-            from src.topologies.test import Test
-            self.topology = Test()
+        elif(type == Topologies.VariousLayers):
+            from topologies.variouslayers import VariousLayers
+            self.topology = VariousLayers()
         
         # Add new network topology type condition here!
         assert self.topology != None, "Topology is null!"
@@ -64,20 +64,19 @@ class Topology:
         for i in range(len(predictions)):
             target = targets[i]
             for j in range(len(predictions[i])):
+                total += 1
                 if(isnan(predictions[i][j])):
                     continue
-                # print(f"predictions[{i}][{j}]",predictions[i][j])
-                # print(f"target[{j}]",target[j])
-                if(round(predictions[i][j]) == target[j]):
+                elif(round(predictions[i][j]) == target[j]):
                     correct += 1
                 else:
                     if(j in self.errors):
                         self.errors[j] += 1
                     else:
                         self.errors[j] = 1
-                total += 1
+                
         print(f"{correct}/{total}")
-        print(f"Acc: {0 if total == 0 else correct/total}")
+        print(f"Acc: {correct/total}")
 
         
     def graph(self):
