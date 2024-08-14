@@ -37,6 +37,7 @@ class Console:
         self.stage = ConsoleStages.MC_DataDecision
         self.modelConf : ModelConfiguration = None
         self.topologyConf : Topology = None
+        self.bitLength = None
         self.df = None
 
     def start(self):
@@ -94,6 +95,7 @@ class Console:
                     inp = input(":")
                     self.df = read_csv(f"{Console.bitGroupPath}/{data_list[int(inp)-1]}", 
                                     names=["p","q","n","phi","e","d"])
+                    self.bitLength = int(data_list[int(inp)-1].split(".")[0].split("_")[1])
                     self.stage = ConsoleStages.MC_ModelTypeSelection
                 except:
                     continue
@@ -108,14 +110,14 @@ class Console:
                     inp = input(":")
                     selectedModelType = models[int(inp)-1]
                     print(f"{selectedModelType} is selected!")
-                    print("------------------------------------\n")
-                    print("Select Bit Length")
-                    for i, bit in enumerate(Console.bitGroups):
-                        print(f"{i+1}-{bit}")
-                    inp = input(":")
-                    selectedBitLength = Console.bitGroups[int(inp)-1]
+                    # print("------------------------------------\n")
+                    # print("Select Bit Length")
+                    # for i, bit in enumerate(Console.bitGroups):
+                    #     print(f"{i+1}-{bit}")
+                    # inp = input(":")
+                    # selectedBitLength = Console.bitGroups[int(inp)-1]
                     self.modelConf = ModelConfiguration(ModelConfigurations[selectedModelType],
-                                                        selectedBitLength)
+                                                        self.bitLength)
                     self.stage = ConsoleStages.MC_DataProcessing
                 except:
                     continue

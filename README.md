@@ -21,14 +21,13 @@ RSA ML Attacks
   ```
   python main.py
   ```
-- Select dataset creating option
+- Select one of the dataset creating options
   - Create new dataset
   - Load processed dataset
 - Select one of the listed unprocessed dataset group.
 - Select model type (You can also create your custom model type under `./src/modelConfigurations/` folder)
-- Select bit length based on the selected dataset group
-- End of the dataset preparation process, you can save the processed data to later use.
-- Select model topology
+- At the end of the dataset preparation process, you can save the processed data to later use.
+- Select one of the model topology options
   - Train a new model with one of models listed ( You can also create your custom training model under `./src/topologies/` folder). After training with the selected topology, model can be saved under the 'Models' location
   - Load a pretrained model.
 - After testing you can select to create and save the graph of falsely predicted bit positions and it will be under 'Graphs' location

@@ -28,7 +28,7 @@ class Topology:
         
 
     def load_model(self,path):
-        from tensorflow.keras.models import load_model
+        from tensorflow.keras.models import load_model # type: ignore
         self.topology.model = load_model(path)
 
     def setEpoch(self, epoch):
