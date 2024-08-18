@@ -14,7 +14,7 @@ class ModelSOA:
     def process(self, inputs, outputs, bit_group):
         from decimal import Decimal, localcontext
         from numpy import empty
-        from src.helpers import Helper
+        from src.helper import Helper
         assert len(inputs) == len(outputs), "Input-Output data sizes do not match!"
 
         size = len(inputs)

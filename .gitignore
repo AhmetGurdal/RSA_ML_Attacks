@@ -1,6 +1,7 @@
 data/processed/*
 data/models/*
 data/figures/*
+data/primes/*
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

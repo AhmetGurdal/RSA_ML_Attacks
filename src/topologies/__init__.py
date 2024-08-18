@@ -1,28 +1,37 @@
-
-from enum import Enum
-
-from src.modelConfigurations import ModelConfiguration
-
-class Topologies(Enum):
-    MultiDense = "MultiDense"
-    VariousLayers = "VariousLayers"
-    # Add new network topology type here!
+from src.dataConfigurations import DataConfiguration
+from importlib import import_module
 
 class Topology:
-    def __init__(self, type : Topologies, conf : ModelConfiguration):
+    
+    @staticmethod
+    def getTopologies():
+        from os import listdir
+        from os.path import dirname
+        from inspect import getmembers, isclass
+        
+        class_names = []
+        test_folder = dirname(__file__)
+        for file_name in listdir(test_folder):
+            if file_name.endswith('.py') and file_name != '__init__.py':
+                module_name = file_name[:-3]
+                module = import_module(f'src.topologies.{module_name}')
+                for name, obj in getmembers(module, isclass):
+                    if obj.__module__ == module.__name__:
+                        class_names.append(name)
+        return class_names
+    
+    topologies = getTopologies()
+
+    def __init__(self, type : str, conf : DataConfiguration):
         self.conf = conf
         self.type = type
         self.topology = None
         self.fig = None
         self.errors = None
         self.epoch = None
-        if(type == Topologies.MultiDense):
-            from src.topologies.multidense import MultiDense
-            self.topology = MultiDense()
-        elif(type == Topologies.VariousLayers):
-            from topologies.variouslayers import VariousLayers
-            self.topology = VariousLayers()
-        
+        module = import_module(f'src.topologies.{type.lower()}')
+        cls = getattr(module, type)
+        self.topology = cls()
         # Add new network topology type condition here!
         assert self.topology != None, "Topology is null!"
         

@@ -1,7 +1,7 @@
 
 # Create a simple neural network model
 class VariousLayers:
-
+    
     def __init__(self):
         self.topologyName = "VariousLayers"
 

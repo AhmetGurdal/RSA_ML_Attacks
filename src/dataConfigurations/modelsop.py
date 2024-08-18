@@ -1,21 +1,21 @@
-class ModelSEP:
+class ModelSOP:
     def __init__(self):
         self.inputColumns=["n"]
         self.outputColumns=["p"]
-        self.modelName = "ModelSEP"
-        ### Model se-p
+        self.modelName = "ModelSOP"
+        ### Model so-p
         """
-        - Model input is closest even to the square root of n
+        - Model input is closest odd to the square root of n
         - Model output is the binary of prime p.
         """
-
+        
     def setSizes(self, size, bit_group):
         self.sizes = ((size,bit_group), (size,bit_group))
 
     def process(self, inputs, outputs, bit_group):
         from decimal import Decimal, localcontext
         from numpy import empty
-        from src.helpers import Helper
+        from src.helper import Helper
         assert len(inputs) == len(outputs), "Input-Output data sizes do not match!"
 
         size = len(inputs)
@@ -30,7 +30,7 @@ class ModelSEP:
 
                 N = Decimal(int(inputs[i]))
                 S = N.sqrt()
-                RS = Helper.roundodd(S,0)
+                RS = Helper.roundodd(S,1)
 
                 # Input Data
                 RS_bin =  str(bin(int(RS)))[2:]

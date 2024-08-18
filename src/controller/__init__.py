@@ -1,7 +1,7 @@
 from enum import Enum
 
-from src.modelConfigurations import ModelConfiguration, ModelConfigurations
-from src.topologies import Topologies, Topology
+from src.dataConfigurations import DataConfiguration
+from src.topologies import  Topology
 
 class ConsoleStages(Enum):
     MC_DataDecision = 0
@@ -29,13 +29,24 @@ class Console:
     figurePath = "./data/figures"
     bitGroups = [256,512,1024,2048]
 
+    def check_directories():
+        from os import makedirs
+        from os.path import exists
+        directories = [Console.bitGroupPath, 
+                       Console.processedDataPath, 
+                       Console.topologyPath, 
+                       Console.figurePath]
+        for dir in directories:
+            if(not exists(dir)):
+                makedirs(dir)
     def clear():
         from os import system, name as os_name
         system('cls' if os_name == 'nt' else 'clear')
 
     def __init__(self):
+        Console.check_directories()
         self.stage = ConsoleStages.MC_DataDecision
-        self.modelConf : ModelConfiguration = None
+        self.modelConf : DataConfiguration = None
         self.topologyConf : Topology = None
         self.bitLength = None
         self.df = None
@@ -77,7 +88,7 @@ class Console:
                 try:
                     inp = input(":")
                     modelName, bitGroup = data_set[int(inp)-1].split("_")[:2]
-                    self.modelConf = ModelConfiguration(ModelConfigurations[modelName], int(bitGroup))
+                    self.modelConf = DataConfiguration(modelName, int(bitGroup))
                     inputs = load(f"{Console.processedDataPath}/{modelName}_{bitGroup}_inputs.npy")
                     outputs = load(f"{Console.processedDataPath}/{modelName}_{bitGroup}_outputs.npy")
                     self.modelConf.setPostData(inputs,outputs)
@@ -101,10 +112,10 @@ class Console:
                     continue
 
             elif(self.stage == ConsoleStages.MC_ModelTypeSelection):
-                models = [e.value for e in ModelConfigurations]
+                models = [e for e in DataConfiguration.dataTypes]
                
                 try:
-                    print("Select Model Type")
+                    print("Select Data Processing Type")
                     for i,v in enumerate(models):
                         print(f"{i+1}-{v}")
                     inp = input(":")
@@ -116,7 +127,7 @@ class Console:
                     #     print(f"{i+1}-{bit}")
                     # inp = input(":")
                     # selectedBitLength = Console.bitGroups[int(inp)-1]
-                    self.modelConf = ModelConfiguration(ModelConfigurations[selectedModelType],
+                    self.modelConf = DataConfiguration(selectedModelType,
                                                         self.bitLength)
                     self.stage = ConsoleStages.MC_DataProcessing
                 except:
@@ -166,7 +177,7 @@ class Console:
                 inp = input(":")
                 split = model_list[int(inp) - 1].split(".")[0].split("_")
                 selectedTopologyName = split[0]
-                self.topologyConf = Topology(Topologies[selectedTopologyName],self.modelConf)
+                self.topologyConf = Topology(selectedTopologyName,self.modelConf)
                 self.topologyConf.setEpoch(int(split[-1][1:]))
                 path = f"{Console.topologyPath}/{model_list[int(inp) - 1]}"
                 print(f"Loading {path}")
@@ -179,18 +190,16 @@ class Console:
 
 
             elif(self.stage == ConsoleStages.TC_TopologyTypeSelection):
-                topologies = [e.value for e in Topologies]
-                #while True:
-                #    try:
+                
                 print("Select Model Type")
-                for i,v in enumerate(topologies):
+                for i,v in enumerate(Topology.topologies):
                     print(f"{i+1}-{v}")
                 
                 inp = input(":")
-                selectedTopology = topologies[int(inp)-1]
-                print(f"{selectedTopology} is selected!")
+                selectedTopologyName = Topology.topologies[int(inp)-1]
+                print(f"{selectedTopologyName} is selected!")
 
-                self.topologyConf = Topology(Topologies[selectedTopology],self.modelConf)
+                self.topologyConf = Topology(selectedTopologyName,self.modelConf)
                 self.stage = ConsoleStages.TC_TopologyEpoch
 
             elif(self.stage == ConsoleStages.TC_TopologyEpoch):
@@ -228,7 +237,7 @@ class Console:
                 self.stage = ConsoleStages.Testing_SaveGraph
 
             elif(self.stage == ConsoleStages.Testing_SaveGraph):
-                print("Create and Save Faulty Bit Position Graph? (y/n)")
+                print("Create and Save Faulty Bit Position Graph? (y/n)(default:y)")
                 inp = input(":")
                 if(inp != "n" and inp != "N"):
                     self.topologyConf.graph()

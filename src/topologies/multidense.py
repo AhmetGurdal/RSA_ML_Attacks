@@ -1,10 +1,9 @@
 
 # Create a simple neural network model
 class MultiDense:
-
+    
     def __init__(self):
         self.topologyName = "MultiDense"
-
 
     def create(self, i_size,o_size):
         from tensorflow.keras.models import Sequential # type: ignore
