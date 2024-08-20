@@ -12,7 +12,7 @@ class Topology:
         class_names = []
         test_folder = dirname(__file__)
         for file_name in listdir(test_folder):
-            if file_name.endswith('.py') and file_name != '__init__.py':
+            if file_name.endswith('.py') and file_name != '__init__.py' and not file_name.startswith("."):
                 module_name = file_name[:-3]
                 module = import_module(f'src.topologies.{module_name}')
                 for name, obj in getmembers(module, isclass):
@@ -29,7 +29,7 @@ class Topology:
         self.fig = None
         self.errors = None
         self.epoch = None
-        module = import_module(f'src.topologies.{type.lower()}')
+        module = import_module(f'src.topologies.{type}')
         cls = getattr(module, type)
         self.topology = cls()
         # Add new network topology type condition here!

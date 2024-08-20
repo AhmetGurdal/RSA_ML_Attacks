@@ -24,3 +24,21 @@ class Helper:
             y = int(size / x)
         return x,y
     
+    @staticmethod
+    def processArgs():
+        from sys import argv
+        dataConfig = None
+        topologies = "all"
+        epoch = 100
+        print(argv)
+        argc = len(argv)
+        if("-dc" in argv):
+            loc = argv.index("-dc") + 1
+            if(loc < argc):
+                dataConfig = argv[loc]
+        if("-e" in argv):
+            loc = argv.index("-e") + 1
+            if(loc < argc):
+                epoch = argv[loc]
+        return {"dataConfig" : dataConfig, "topologies" : topologies, "epoch" : epoch}
+    

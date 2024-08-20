@@ -11,7 +11,7 @@ class DataConfiguration:
         class_names = []
         test_folder = dirname(__file__)
         for file_name in listdir(test_folder):
-            if file_name.endswith('.py') and file_name != '__init__.py':
+            if file_name.endswith('.py') and file_name != '__init__.py' and not file_name.startswith("."):
                 module_name = file_name[:-3]
                 module = import_module(f'src.dataConfigurations.{module_name}')
                 for name, obj in getmembers(module, isclass):
@@ -23,7 +23,7 @@ class DataConfiguration:
     def __init__(self, type : str, bit_group):
         self.model = None
         self.bit_group = bit_group
-        module = import_module(f'src.dataConfigurations.{type.lower()}')
+        module = import_module(f'src.dataConfigurations.{type}')
         cls = getattr(module, type)
         self.model = cls()
         assert self.model != None, "Data Configuration is null!"
