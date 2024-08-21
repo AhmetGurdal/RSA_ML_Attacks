@@ -44,6 +44,8 @@ class Console:
         system('cls' if os_name == 'nt' else 'clear')
 
     def __init__(self):
+        from src.helper.ArgHandler import ArgHandler
+        self.arghandler = ArgHandler()
         Console.check_directories()
         self.stage = ConsoleStages.DC_DataDecision
         self.dataConf : DataConfiguration = None
@@ -63,12 +65,10 @@ class Console:
         
 
     def start(self):
-        from src.helper import Helper
-        args = Helper.processArgs()
-        if(args["dataConfig"] != None):
+        if(vars(self.arghandler.args).get("dc") != None):
             self.isAutomated = True
             self.currentTopology = 0
-            self.setDataConf(args["dataConfig"])
+            self.setDataConf(vars(self.arghandler.args).get("dc"))
             self.stage = ConsoleStages.TC_TopologyTypeSelection
         from os import listdir
         inp = None
@@ -76,9 +76,7 @@ class Console:
             try:
                 Console.clear()
                 if(inp == "q"):
-                    from sys import exit
-                    exit()
-
+                    break
                 if(self.stage == ConsoleStages.DC_DataDecision):
                     print("Select the data preparation option")
                     print("1- Create new dataset")
@@ -212,7 +210,7 @@ class Console:
 
                 elif(self.stage == ConsoleStages.TC_TopologyEpoch):
                     if(self.isAutomated):
-                        self.topologyConf.setEpoch(int(args["epoch"]))
+                        self.topologyConf.setEpoch(int(vars(self.arghandler.args).get("e")))
                         self.stage = ConsoleStages.TC_Training
                     else:
                         try:

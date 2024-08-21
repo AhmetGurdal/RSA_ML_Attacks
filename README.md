@@ -17,10 +17,15 @@ RSA ML Attacks
 | Graphs | `./data/figures` |
 
 ## Use
-- Start the application 
+- Start the application (CLI mode)
   ```
   python main.py
   ```
+  To get detailed usage run
+  ```
+  python main.py -h|--help
+  ```
+
 - Select one of the dataset creating options
   - Create new dataset
   - Load processed dataset
