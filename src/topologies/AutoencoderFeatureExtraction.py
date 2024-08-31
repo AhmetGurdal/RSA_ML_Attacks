@@ -10,18 +10,16 @@ class AutoencoderFeatureExtraction:
 
         # Encoder
         input_layer = Input(shape=(i_size,))
-        encoded = Dense(128, activation='relu')(input_layer)
-        encoded = Dense(64, activation='relu')(encoded)
-        encoded_output = Dense(32, activation='relu')(encoded)
+        encoded = Dense(i_size // 2, activation='relu')(input_layer)
+        encoded = Dense(i_size// 4, activation='relu')(encoded)
+        encoded_output = Dense(i_size // 8, activation='relu')(encoded)
 
-        # Decoder for predicting p and q
-        decoded_p = Dense(64, activation='relu')(encoded_output)
-        decoded_p = Dense(128, activation='relu')(decoded_p)
+        # Decoder
+        decoded_p = Dense(i_size // 4, activation='relu')(encoded_output)
+        decoded_p = Dense(i_size // 2, activation='relu')(decoded_p)
         output = Dense(o_size, activation='sigmoid', name='output')(decoded_p)
 
-        # Define the model
         self.model = Model(inputs=input_layer, outputs=[output])
 
-        # Compile the model
         optimizer = Adam(learning_rate=0.001)
         self.model.compile(optimizer=optimizer, loss='binary_crossentropy', metrics=['accuracy'])
