@@ -1,8 +1,8 @@
 
-class Improved:
+class ConvFF:
     
     def __init__(self):
-        self.topologyName = "Improved"
+        self.topologyName = "ConvFF"
 
     def create(self, i_size, o_size):
         from tensorflow.keras.models import Sequential # type: ignore

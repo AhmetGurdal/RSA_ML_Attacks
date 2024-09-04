@@ -12,13 +12,13 @@ class MultiDense:
         
         self.model = Sequential([
             Dense(i_size, activation='relu', input_shape=(i_size,)),
-            Dense(i_size, activation='relu', input_shape=(i_size,)),
-            Dense(i_size, activation='relu', input_shape=(i_size,)),
-            Dense(i_size, activation='relu', input_shape=(i_size,)),
-            Dense(i_size, activation='relu', input_shape=(i_size,)),
-            Dense(i_size, activation='relu', input_shape=(i_size,)),
-            Dense(i_size, activation='relu', input_shape=(i_size,)),
-            Dense(i_size, activation='relu', input_shape=(i_size,)),
+            Dense(i_size, activation='relu'),
+            Dense(i_size, activation='relu'),
+            Dense(i_size, activation='relu'),
+            Dense(i_size, activation='relu'),
+            Dense(i_size, activation='relu'),
+            Dense(i_size, activation='relu'),
+            Dense(i_size, activation='relu'),
             Dense(i_size, activation='relu'),
             Dense(o_size, activation='sigmoid')
         ])
