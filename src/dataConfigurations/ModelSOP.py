@@ -1,4 +1,6 @@
-class ModelSOP:
+from src.classes.dataModel import DataModel
+
+class ModelSOP(DataModel):
     def __init__(self):
         self.inputColumns=["n"]
         self.outputColumns=["p"]

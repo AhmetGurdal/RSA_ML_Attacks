@@ -3,7 +3,9 @@ class HybridConvLSTM:
     def __init__(self):
         self.topologyName = "HybridConvLSTM"
 
-    def create(self, i_size,o_size):
+    def create(self, sizes):
+        i_size = sizes[0][1]
+        o_size = sizes[1][1]
         from tensorflow.keras.models import Sequential # type: ignore
         from tensorflow.keras.layers import Conv1D, MaxPooling1D, Dropout, Flatten, LSTM, Dense # type: ignore
         from tensorflow.keras.optimizers import Adam # type: ignore

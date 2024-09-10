@@ -1,4 +1,6 @@
-class ModelSEP:
+from src.classes.dataModel import DataModel
+
+class ModelSEP(DataModel):
     def __init__(self):
         self.inputColumns=["n"]
         self.outputColumns=["p"]

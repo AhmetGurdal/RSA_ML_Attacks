@@ -44,8 +44,7 @@ class Topology:
         self.epoch = epoch
 
     def train(self):
-        self.topology.create(self.conf.model.sizes[0][1],
-                             self.conf.model.sizes[1][1])
+        self.topology.create(self.conf.model.sizes)
         inputs = self.conf.model.inputs
         outputs = self.conf.model.outputs
         self.topology.model.fit(inputs[:50000], 
@@ -60,33 +59,62 @@ class Topology:
         self.topology.model.save(f'{Console.topologyPath}/{self.topology.topologyName}_{self.conf.model.modelName}_b{self.conf.bit_group}_e{self.epoch}.keras')
 
     def test(self):
-        from numpy import isnan
+        from numpy import isnan, ndarray
         inputs = self.conf.model.inputs[50000:]
         targets = self.conf.model.outputs[50000:]
 
         print("Creating Predictions")
         predictions = self.topology.model.predict(inputs)
+
         print("Please wait for calculating the accuracy!")
+
+        self.errors = {}
         total = 0
         correct = 0
-        self.errors = {}
-        for i in range(len(predictions)):
-            target = targets[i]
-            for j in range(len(predictions[i])):
-                total += 1
-                if(isnan(predictions[i][j])):
-                    continue
-                elif(round(predictions[i][j]) == target[j]):
-                    correct += 1
-                else:
-                    if(j in self.errors):
-                        self.errors[j] += 1
+        if(type(predictions[0][0]) == ndarray):
+            correct,total = self.test2D(targets, predictions)
+        else:
+            for i in range(len(predictions)):
+                #print("Target", targets[i])
+                #print("Prediction", predictions[i])
+                target = targets[i]
+                for j in range(len(predictions[i])):
+                    total += 1
+                    if(isnan(predictions[i][j])):
+                        continue
+                    elif(round(predictions[i][j]) == target[j]):
+                        correct += 1
                     else:
-                        self.errors[j] = 1
-                
+                        if(j in self.errors):
+                            self.errors[j] += 1
+                        else:
+                            self.errors[j] = 1
+                    
         print(f"{correct}/{total}")
         print(f"Acc: {correct/total}")
 
+
+    def test2D(self, targets, predictions):
+        from numpy import isnan
+        total = 0
+        correct = 0
+        for i in range(len(predictions)):
+            target = targets[i]
+            pred = predictions[i]
+            for x in range(len(pred)):
+                for y in range(len(pred[x])):
+                    total += 1
+                    if(isnan(pred[x][y][0])):
+                        continue
+                    elif(round(pred[x][y][0]) == target[x][y][0]):
+                        correct += 1
+                    else:
+                        ind = (x*(len(pred[x])) + y)
+                        if(ind in self.errors):
+                            self.errors[ind] += 1
+                        else:
+                            self.errors[ind] = 1
+        return correct,total
         
     def graph(self):
         from numpy import array

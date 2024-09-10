@@ -1,4 +1,6 @@
-class ModelNP2:
+from src.classes.dataModel import DataModel
+
+class ModelNP2(DataModel):
     def __init__(self):
         self.inputColumns=["n"]
         self.outputColumns=["p"]

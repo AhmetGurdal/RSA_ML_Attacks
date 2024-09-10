@@ -22,4 +22,4 @@ class Helper:
         else :
             x = int((x / 2) ** 0.5)
             y = int(size / x)
-        return x,y
+        return y,x

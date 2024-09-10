@@ -16,7 +16,9 @@ RSA ML Attacks
 | Models | `./data/models` |
 | Graphs | `./data/figures` |
 
-## Use
+## Usage (CLI mode)
+
+**_NOTE:_** In CLI mode, application can be stopped by entering "q" when a user input is requested!
 - Start the application (CLI mode)
   ```
   python main.py
@@ -25,7 +27,6 @@ RSA ML Attacks
   ```
   python main.py -h|--help
   ```
-
 - Select one of the dataset creating options
   - Create new dataset
   - Load processed dataset

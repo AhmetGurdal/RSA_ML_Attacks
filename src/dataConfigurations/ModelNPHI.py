@@ -1,4 +1,6 @@
-class ModelNPHI:
+from src.classes.dataModel import DataModel
+
+class ModelNPHI(DataModel):
     def __init__(self):
         self.inputColumns=["n"]
         self.outputColumns=["phi"]

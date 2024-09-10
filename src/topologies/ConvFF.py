@@ -4,7 +4,9 @@ class ConvFF:
     def __init__(self):
         self.topologyName = "ConvFF"
 
-    def create(self, i_size, o_size):
+    def create(self, sizes):
+        i_size = sizes[0][1]
+        o_size = sizes[1][1]
         from tensorflow.keras.models import Sequential # type: ignore
         from tensorflow.keras.layers import Dense, Dropout, Conv1D, Flatten # type: ignore
         from tensorflow.keras.optimizers import Adam  # type: ignore

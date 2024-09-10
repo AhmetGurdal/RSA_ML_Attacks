@@ -3,21 +3,23 @@ class Hierarchical:
     def __init__(self):
         self.topologyName = "Hierarchical"
 
-    def create(self, i_size, o_size):
+    def create(self, sizes):
+        i_size = sizes[0][1]
+        o_size = sizes[1][1]
         from tensorflow.keras.layers import Input, Dense, Concatenate # type: ignore
         from tensorflow.keras.models import Model # type: ignore
         from tensorflow.keras.optimizers import Adam  # type: ignore
 
         # First stage: Predict an intermediate value
         input_layer = Input(shape=(i_size,))
-        intermediate = Dense(128, activation='relu')(input_layer)
-        intermediate = Dense(64, activation='relu')(intermediate)
+        intermediate = Dense(i_size // 2, activation='relu')(input_layer)
+        intermediate = Dense(i_size // 4, activation='relu')(intermediate)
         intermediate_output = Dense(1, activation='linear', name='intermediate_output')(intermediate)
 
         # Second stage: Predict p and q using intermediate value
         second_input = Concatenate()([input_layer, intermediate_output])
-        hidden = Dense(128, activation='relu')(second_input)
-        hidden = Dense(64, activation='relu')(hidden)
+        hidden = Dense(i_size // 2, activation='relu')(second_input)
+        hidden = Dense(i_size // 4, activation='relu')(hidden)
         output = Dense(o_size, activation='sigmoid', name='output')(hidden)
 
         self.model = Model(inputs=input_layer, outputs=[output])

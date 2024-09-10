@@ -1,4 +1,5 @@
 from importlib import import_module
+from src.classes.dataModel import DataModel
 
 class DataConfiguration:
 
@@ -21,7 +22,7 @@ class DataConfiguration:
     dataTypes = getDataProcessingTypes()
 
     def __init__(self, type : str, bit_group):
-        self.model = None
+        self.model : DataModel = None
         self.bit_group = bit_group
         module = import_module(f'src.dataConfigurations.{type}')
         cls = getattr(module, type)
@@ -38,7 +39,6 @@ class DataConfiguration:
         self.model.outputs = outputs
         self.model.setSizes(len(inputs), self.bit_group)
         
-
     def process(self):
         print("Please wait while processing the data!")
         self.model.process(self.inputs, self.outputs, self.bit_group)

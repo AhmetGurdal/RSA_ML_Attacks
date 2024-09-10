@@ -1,4 +1,6 @@
-class ModelNQ:
+from src.classes.dataModel import DataModel
+
+class ModelNQ(DataModel):
     def __init__(self):
         self.inputColumns=["n"]
         self.outputColumns=["q"]
