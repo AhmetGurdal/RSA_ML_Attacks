@@ -4,11 +4,12 @@ class ConvMatrix:
         self.topologyName = "ConvMatrix"
 
     def create(self, sizes):
+        
+        assert len(sizes[0]) == 4, "input size is not suitable for this model"
+        assert len(sizes[1]) == 4, "output size is not suitable for this model"
+        
         i_size = sizes[0][1:3]
         o_size = sizes[1][1:3]
-        
-        # assert i_size.length == 2, "input size is not suitable for this model"
-        # assert o_size.length == 2, "output size is not suitable for this model"
 
         from tensorflow.keras.models import Sequential # type: ignore
         from tensorflow.keras.layers import Conv2D # type: ignore

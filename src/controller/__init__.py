@@ -27,21 +27,35 @@ class Console:
     processedDataPath = "./data/processed"
     topologyPath = "./data/models"
     figurePath = "./data/figures"
+    resultFile = "./data/results.txt"
     bitGroups = [256,512,1024,2048]
 
     def check_directories():
         from os import makedirs
         from os.path import exists
         directories = [Console.bitGroupPath, 
-                       Console.processedDataPath, 
+                       Console.processedDataPath,
                        Console.topologyPath, 
                        Console.figurePath]
-        for dir in directories:
-            if(not exists(dir)):
-                makedirs(dir)
+        for directory in directories:
+            if(not exists(directory)):
+                makedirs(directory)
+        for bitGroup in Console.bitGroups:
+            directory = f"{Console.processedDataPath}/{bitGroup}"
+            if(not exists(directory)):
+                makedirs(directory)
     def clear():
         from os import system, name as os_name
         system('cls' if os_name == 'nt' else 'clear')
+
+    def filter_models(self, model_list : list):
+        new_list = []
+        for model in model_list:
+            if(self.dataConf.bit_group in model and 
+               self.dataConf.model.modelName in model):
+                new_list.append(model)
+        return new_list
+
 
     def __init__(self):
         from src.helper.ArgHandler import ArgHandler
@@ -55,12 +69,11 @@ class Console:
         self.isAutomated = False
 
 
-    def setDataConf(self, dataset : str):
+    def setDataConf(self, modelName : str, bitGroup : str):
         from numpy import load
-        modelName, bitGroup = dataset.split("_")[:2]
         self.dataConf = DataConfiguration(modelName, int(bitGroup))
-        inputs = load(f"{Console.processedDataPath}/{modelName}_{bitGroup}_inputs.npy")
-        outputs = load(f"{Console.processedDataPath}/{modelName}_{bitGroup}_outputs.npy")
+        inputs = load(f"{Console.processedDataPath}/{bitGroup}/{modelName}_inputs.npy")
+        outputs = load(f"{Console.processedDataPath}/{bitGroup}/{modelName}_outputs.npy")
         self.dataConf.setPostData(inputs,outputs)
         
 
@@ -68,7 +81,7 @@ class Console:
         if(vars(self.arghandler.args).get("dc") != None):
             self.isAutomated = True
             self.currentTopology = 0
-            self.setDataConf(vars(self.arghandler.args).get("dc"))
+            self.setDataConf(vars(self.arghandler.args).get("dc"), self.arghandler.args.get("bg"))
             self.stage = ConsoleStages.TC_TopologyTypeSelection
         from os import listdir
         inp = None
@@ -87,20 +100,31 @@ class Console:
                     self.stage = ConsoleStages.DC_LoadDataSelection
             
             elif(self.stage == ConsoleStages.DC_LoadDataSelection):
-                data_list = listdir(Console.processedDataPath)
+                bit_group = None
+                while True:
+                    print("Select bit group")
+                    for i,b in enumerate(self.bitGroups):
+                        print(f"{i+1}- {b}")
+                    bit_group = input(":")
+                    if(int(bit_group) < 1 or int(bit_group) > len(self.bitGroups)):
+                        print("Wrong selection, please try again.") 
+                    else:
+                        bit_group = str(self.bitGroups[int(bit_group)-1])
+                        break
+                data_list = listdir(f"{Console.processedDataPath}/{bit_group}")
                 if(len(data_list) == 0):
                     print("No data found! Type ENTER to create!")
                     input()
                     self.stage = ConsoleStages.DC_DataSelection
                     continue
 
-                data_set = list(set(["_".join(i.split("_")[:2]) for i in data_list]))
+                data_set = list(set([i.split("_")[0] for i in data_list]))
                 for i,v in enumerate(data_set):
                     print(f"{i+1}-{v}")
                 
                 try:
                     inp = input(":")
-                    self.setDataConf(data_set[int(inp)-1])
+                    self.setDataConf(data_set[int(inp)-1], bit_group)
                     self.stage = ConsoleStages.TC_TopologyDecision
                 except:
                     break
@@ -147,7 +171,6 @@ class Console:
                 self.dataConf.process()
                
                 if(self.isAutomated):
-                    self.currentTopology += 1
                     self.stage = ConsoleStages.TC_TopologyTypeSelection
 
                 self.stage = ConsoleStages.DC_Saving
@@ -173,7 +196,7 @@ class Console:
 
             elif(self.stage == ConsoleStages.TC_LoadTopologySelection):
                 model_list = listdir(Console.topologyPath)
-                
+                model_list = self.filter_models(model_list)
                 #try:
                 print("Select a model to load!")
                 if(len(model_list) == 0):
@@ -200,6 +223,8 @@ class Console:
 
             elif(self.stage == ConsoleStages.TC_TopologyTypeSelection):
                 if(self.isAutomated):
+                    if(self.currentTopology > len(Topology.topologies)):
+                        exit()
                     selectedTopologyName  = Topology.topologies[self.currentTopology]
                     print(f"{selectedTopologyName} is selected!")
                     self.topologyConf = Topology(selectedTopologyName,self.dataConf)
@@ -241,18 +266,8 @@ class Console:
 
 
             elif(self.stage == ConsoleStages.Testing_Accuracy):
-                self.topologyConf.test()
+                self.topologyConf.test(self.resultFile)
                 self.stage = ConsoleStages.Testing_SaveGraph
-                
-                #print("Show graph? (y/n)")
-                #inp = input(":")
-                #if(inp != "n" and inp != "N"):
-                #    self.stage = ConsoleStages.Testing_ShowGraph
-                #else:
-
-            # elif(self.stage == ConsoleStages.Testing_ShowGraph):
-            #     self.topologyConf.graph()
-            #     self.stage = ConsoleStages.Testing_SaveGraph
 
             elif(self.stage == ConsoleStages.Testing_SaveGraph):
                 if(self.isAutomated):

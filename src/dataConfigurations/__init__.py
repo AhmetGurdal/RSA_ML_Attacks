@@ -48,8 +48,8 @@ class DataConfiguration:
         from src.controller import Console
         print(self.model.inputs.shape)
         print(self.model.outputs.shape)
-        save(f"{Console.processedDataPath}/{self.model.modelName}_{self.bit_group}_inputs.npy",
+        save(f"{Console.processedDataPath}/{self.bit_group}/{self.model.modelName}_inputs.npy",
              self.model.inputs)
-        save(f"{Console.processedDataPath}/{self.model.modelName}_{self.bit_group}_outputs.npy",
+        save(f"{Console.processedDataPath}/{self.bit_group}/{self.model.modelName}_outputs.npy",
              self.model.outputs)
         

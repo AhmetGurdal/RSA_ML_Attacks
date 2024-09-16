@@ -25,11 +25,6 @@ class ModelMNPQ(DataModel):
         input_size = len(inputs)
         self.setSizes(input_size,bit_group)
 
-        # assert type(outputs[0]) == ndarray, "In Modelnpq - each row of output should be an array!"
-        # assert len(outputs[0]) == 2, "In Modelnpq - output array size should be 2(both primes)!"
-        
-        
-        print(self.sizes)
         self.inputs = empty(shape=(self.sizes[0]))
         self.outputs = empty(shape=(self.sizes[1]))
 
@@ -55,8 +50,5 @@ class ModelMNPQ(DataModel):
 
         self.inputs = self.inputs.reshape(-1,self.sizes[0][1],self.sizes[0][2],1)
         self.outputs = self.outputs.reshape(-1,self.sizes[1][1],self.sizes[1][2],1)
-        print(self.inputs.shape)
-        print(self.outputs.shape)
-        input()
         self.sizes=((self.sizes[0][0],self.sizes[0][1],self.sizes[0][2],1), 
                     (self.sizes[1][0],self.sizes[1][1],self.sizes[1][2],1))

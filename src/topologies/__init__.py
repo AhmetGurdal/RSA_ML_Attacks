@@ -29,6 +29,7 @@ class Topology:
         self.fig = None
         self.errors = None
         self.epoch = None
+        self.accuracy = None
         module = import_module(f'src.topologies.{type}')
         cls = getattr(module, type)
         self.topology = cls()
@@ -58,7 +59,7 @@ class Topology:
         from src.controller import Console
         self.topology.model.save(f'{Console.topologyPath}/{self.topology.topologyName}_{self.conf.model.modelName}_b{self.conf.bit_group}_e{self.epoch}.keras')
 
-    def test(self):
+    def test(self, resultFile):
         from numpy import isnan, ndarray
         inputs = self.conf.model.inputs[50000:]
         targets = self.conf.model.outputs[50000:]
@@ -89,9 +90,11 @@ class Topology:
                             self.errors[j] += 1
                         else:
                             self.errors[j] = 1
-                    
+        self.accuracy = correct/total
+        with open(resultFile, "a") as f:
+            f.write(f"{self.topology.topologyName} - {self.conf.model.modelName} - Acc : {self.accuracy}\n")
         print(f"{correct}/{total}")
-        print(f"Acc: {correct/total}")
+        print(f"Acc: {self.accuracy}")
 
 
     def test2D(self, targets, predictions):
@@ -124,7 +127,8 @@ class Topology:
 
         self.fig, ax = plt.subplots()
         ax.plot(xs,ys)
-        max_y = 100 if len(self.errors) == 0 else max(self.errors.values()) + 1000
+        max_y = 1000 if len(self.errors) == 0 else max(self.errors.values()) + 1000
+        ax.text(len(xs)//2 - len(xs)//6, max_y + 30, f'Acc : {round(self.accuracy, 4)}', fontsize = 14)
         ax.set_ylim([0, max_y])
         # def annot_max(x,y,i, ax=None):
         #     text= "x={}, y={}".format(x+1, y)

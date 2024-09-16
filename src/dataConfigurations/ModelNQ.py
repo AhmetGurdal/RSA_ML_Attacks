@@ -8,18 +8,18 @@ class ModelNQ(DataModel):
         ### Model n-pq
         """
         - Model input is n in binary form.
-        - Model output is the prime q in binary form in order.
+        - Model output is the prime q in binary form.
         """
 
     def setSizes(self, size, bit_group):
-        self.sizes = ((size,bit_group*2), (size,bit_group*2))
+        self.sizes = ((size,bit_group*2), (size,bit_group))
 
     def process(self, inputs, outputs, bit_group):
         from numpy import empty
         assert len(inputs) == len(outputs), "Input-Output data sizes do not match!"
 
         size = len(inputs)
-        self.sizes = ((size,bit_group*2), (size,bit_group*2))
+        self.sizes = ((size,bit_group*2), (size,bit_group))
         
         #Empty data
         self.inputs = empty(shape=self.sizes[0])

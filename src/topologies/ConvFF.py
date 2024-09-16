@@ -1,10 +1,13 @@
-
 class ConvFF:
     
     def __init__(self):
         self.topologyName = "ConvFF"
 
     def create(self, sizes):
+
+        assert len(sizes[0]) == 2, "input size is not suitable for this model"
+        assert len(sizes[1]) == 2, "output size is not suitable for this model"
+        
         i_size = sizes[0][1]
         o_size = sizes[1][1]
         from tensorflow.keras.models import Sequential # type: ignore
