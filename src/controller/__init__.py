@@ -51,7 +51,7 @@ class Console:
     def filter_models(self, model_list : list):
         new_list = []
         for model in model_list:
-            if(self.dataConf.bit_group in model and 
+            if(str(self.dataConf.bit_group) in model and 
                self.dataConf.model.modelName in model):
                 new_list.append(model)
         return new_list
@@ -81,7 +81,8 @@ class Console:
         if(vars(self.arghandler.args).get("dc") != None):
             self.isAutomated = True
             self.currentTopology = 0
-            self.setDataConf(vars(self.arghandler.args).get("dc"), self.arghandler.args.get("bg"))
+            self.setDataConf(vars(self.arghandler.args).get("dc"), 
+                             vars(self.arghandler.args).get("bg"))
             self.stage = ConsoleStages.TC_TopologyTypeSelection
         from os import listdir
         inp = None
