@@ -37,7 +37,7 @@ class DataConfiguration:
     def setPostData(self, inputs, outputs):
         self.model.inputs = inputs
         self.model.outputs = outputs
-        self.model.setSizes(len(inputs), self.bit_group)
+        self.model.setPostSizes(inputs.shape, outputs.shape)
         
     def process(self):
         print("Please wait while processing the data!")
