@@ -224,7 +224,7 @@ class Console:
 
             elif(self.stage == ConsoleStages.TC_TopologyTypeSelection):
                 if(self.isAutomated):
-                    if(self.currentTopology > len(Topology.topologies)):
+                    if(self.currentTopology >= len(Topology.topologies)):
                         exit()
                     selectedTopologyName  = Topology.topologies[self.currentTopology]
                     print(f"{selectedTopologyName} is selected!")
