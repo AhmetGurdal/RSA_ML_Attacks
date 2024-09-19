@@ -2,7 +2,7 @@ from src.dataConfigurations import DataConfiguration
 from importlib import import_module
 
 class Topology:
-    
+    train_test_rate = 0.9
     @staticmethod
     def getTopologies():
         from os import listdir
@@ -30,6 +30,7 @@ class Topology:
         self.errors = None
         self.epoch = None
         self.accuracy = None
+
         module = import_module(f'src.topologies.{type}')
         cls = getattr(module, type)
         self.topology = cls()
@@ -45,15 +46,16 @@ class Topology:
         self.epoch = epoch
 
     def train(self):
+        split_index = int(len(self.conf.model.inputs) * Topology.train_test_rate)
         self.topology.create(self.conf.model.sizes)
         inputs = self.conf.model.inputs
         outputs = self.conf.model.outputs
-        self.topology.model.fit(inputs[:50000], 
-                                outputs[:50000], 
+        self.topology.model.fit(inputs[:split_index], 
+                                outputs[:split_index], 
                                 epochs=self.epoch, 
                                 verbose=2,
-                                validation_data=(inputs[50000:], 
-                                                 outputs[50000:]))
+                                validation_data=(inputs[split_index:], 
+                                                 outputs[split_index:]))
     
     def save(self):
         from src.controller import Console
@@ -61,8 +63,9 @@ class Topology:
 
     def test(self, resultFile):
         from numpy import isnan, ndarray
-        inputs = self.conf.model.inputs[50000:]
-        targets = self.conf.model.outputs[50000:]
+        split_index = int(len(self.conf.model.inputs) * Topology.train_test_rate)
+        inputs = self.conf.model.inputs[split_index:]
+        targets = self.conf.model.outputs[split_index:]
 
         print("Creating Predictions")
         predictions = self.topology.model.predict(inputs)
