@@ -28,7 +28,7 @@ class Console:
     topologyPath = "./data/models"
     figurePath = "./data/figures"
     resultFile = "./data/results.txt"
-    bitGroups = [256,512,1024,2048]
+    bitGroups = [32,64,256,512,1024,2048]
 
     def check_directories():
         from os import makedirs
