@@ -3,7 +3,7 @@ from src.classes.dataModel import DataModel
 
 class DataConfiguration:
 
-    @staticmethod
+    # @staticmethod
     def getDataProcessingTypes():
         from os import listdir
         from os.path import dirname

@@ -1,7 +1,7 @@
 class Helper:
     # r == 0 -> returns nearest even
     # r == 1 -> returns nearest odd
-    @staticmethod
+    # @staticmethod
     def roundodd(f,r):
         rf = round(f)
         if(rf % 2 == r):
@@ -12,7 +12,7 @@ class Helper:
             else:
                 return rf + 1
             
-    @staticmethod
+    # @staticmethod
     def matrixSizes(size):
         x = size
         y = 1

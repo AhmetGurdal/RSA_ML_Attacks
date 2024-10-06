@@ -3,7 +3,8 @@ from importlib import import_module
 
 class Topology:
     train_test_rate = 0.9
-    @staticmethod
+    
+    # @staticmethod
     def getTopologies():
         from os import listdir
         from os.path import dirname
